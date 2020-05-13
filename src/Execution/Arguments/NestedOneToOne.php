@@ -2,52 +2,51 @@
 
 namespace Nuwave\Lighthouse\Execution\Arguments;
 
+use Illuminate\Support\Collection;
 use Nuwave\Lighthouse\Support\Contracts\ArgResolver;
 
 class NestedOneToOne implements ArgResolver
 {
-    /**
-     * @var string
-     */
-    private $relationName;
+	/**
+	 * @var string
+	 */
+	private $relationName;
 
-    public function __construct(string $relationName)
-    {
-        $this->relationName = $relationName;
-    }
+	public function __construct(string $relationName)
+	{
+		$this->relationName = $relationName;
+	}
 
-    /**
-     * @param  \Illuminate\Database\Eloquent\Model  $parent
-     * @param  \Nuwave\Lighthouse\Execution\Arguments\ArgumentSet  $args
-     * @return void
-     */
-    public function __invoke($parent, $args)
-    {
-        /** @var \Illuminate\Database\Eloquent\Relations\HasOne|\Illuminate\Database\Eloquent\Relations\MorphOne $relation */
-        $relation = $parent->{$this->relationName}();
+	/**
+	 * @param  \Illuminate\Database\Eloquent\Model  $parent
+	 * @param  \Nuwave\Lighthouse\Execution\Arguments\ArgumentSet  $args
+	 * @return void
+	 */
+	public function __invoke($parent, $args)
+	{
+		/** @var \Illuminate\Database\Eloquent\Relations\HasOne|\Illuminate\Database\Eloquent\Relations\MorphOne $relation */
+		$relation = $parent->{$this->relationName}();
 
-        if ($args->has('create')) {
-            $saveModel = new ResolveNested(new SaveModel($relation));
+		$reflection = new \ReflectionClass($relation->getRelated());
+		$availability = $reflection->getStaticPropertyValue('AVAILABILITY_IN_GRAPHQL');
 
-            $saveModel($relation->make(), $args->arguments['create']->value);
-        }
+		$current_related = $parent->{$this->relationName};
 
-        if ($args->has('update')) {
-            $updateModel = new ResolveNested(new UpdateModel(new SaveModel($relation)));
-
-            $updateModel($relation->make(), $args->arguments['update']->value);
-        }
-
-        if ($args->has('upsert')) {
-            $upsertModel = new ResolveNested(new UpsertModel(new SaveModel($relation)));
-
-            $upsertModel($relation->make(), $args->arguments['upsert']->value);
-        }
-
-        if ($args->has('delete')) {
-            $relation->getRelated()::destroy(
-                $args->arguments['delete']->toPlain()
-            );
-        }
-    }
+		if ($args->has('id')) {
+			$data = $args->toArray();
+			if ($data['id'] !== $current_related->id) {
+				// If allowed delete current association
+				if (is_array($availability) && $availability['delete'] === true) {
+					$current_related->cascadeDelete();
+				}
+			}
+			if (is_array($availability) && $availability['update'] === true) {
+				$updateModel = new ResolveNested(new UpdateModel(new SaveModel($relation)));
+				$updateModel($relation->make(), $args);
+			}
+		} elseif (is_array($availability) && $availability['create'] === true) {
+			$saveModel = new ResolveNested(new SaveModel($relation));
+			$saveModel($relation->make(), $args);
+		}
+	}
 }
