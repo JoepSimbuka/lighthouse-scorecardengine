@@ -15,7 +15,7 @@ The `@middleware` directive has been removed, as it violates the boundary betwee
 request handling.
 
 Authentication is one of most common use cases for `@middleware`. You can now use
-the [`@guard`](docs/master/api-reference/directives.md#guard) directive on selected fields.
+the [@guard](docs/master/api-reference/directives.md#guard) directive on selected fields.
 
 ```diff
 type Query {
@@ -24,7 +24,7 @@ type Query {
 }
 ```
 
-Note that [`@guard`](docs/master/api-reference/directives.md#guard) does not log in users.
+Note that [@guard](docs/master/api-reference/directives.md#guard) does not log in users.
 To ensure the user is logged in, add the `AttemptAuthenticate` middleware to your `lighthouse.php`
 middleware config, see the [default config](src/lighthouse.php) for an example.
 
@@ -126,3 +126,16 @@ or a call to `Nuwave\Lighthouse\Subscriptions\Contracts\BroadcastsSubscriptions:
 
 In case you depend on an event being fired whenever a subscription is queued, you can bind your
 own implementation of `Nuwave\Lighthouse\Subscriptions\Contracts\BroadcastsSubscriptions`.
+
+### `TypeRegistry` does not register duplicates by default
+
+Calling `register()` on the `\Nuwave\Lighthouse\Schema\TypeRegistry` now throws when passing
+a type that was already registered, as this most likely is an error.
+
+If you want to previous behaviour of overwriting existing types, use `overwrite()` instead.
+
+```diff
+$typeRegistry = app(\Nuwave\Lighthouse\Schema\TypeRegistry::class);
+-$typeRegistry->register($someType);
++$typeRegistry->overwrite($someType);
+```

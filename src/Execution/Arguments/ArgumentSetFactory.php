@@ -42,6 +42,7 @@ class ArgumentSetFactory
     /**
      * Wrap client-given args with type information.
      *
+     * @param  array<mixed>  $args
      * @return \Nuwave\Lighthouse\Execution\Arguments\ArgumentSet
      */
     public function fromResolveInfo(array $args, ResolveInfo $resolveInfo): ArgumentSet
@@ -94,8 +95,8 @@ class ArgumentSetFactory
     /**
      * Make a map with the name as keys.
      *
-     * @param  \GraphQL\Language\AST\NodeList|iterable<\GraphQL\Language\AST\InputValueDefinitionNode>  $argumentDefinitions
-     * @return array<\GraphQL\Language\AST\InputValueDefinitionNode>
+     * @param  iterable<\GraphQL\Language\AST\InputValueDefinitionNode>  $argumentDefinitions
+     * @return array<string, \GraphQL\Language\AST\InputValueDefinitionNode>
      */
     protected function makeDefinitionMap($argumentDefinitions): array
     {
@@ -111,6 +112,7 @@ class ArgumentSetFactory
     /**
      * Wrap a single client-given argument with type information.
      *
+     * @param  mixed  $value The client given value.
      * @return \Nuwave\Lighthouse\Execution\Arguments\Argument
      */
     protected function wrapInArgument($value, InputValueDefinitionNode $definition): Argument
@@ -158,6 +160,7 @@ class ArgumentSetFactory
     /**
      * Wrap a client-given value with information from a named type.
      *
+     * @param  mixed  $value The client given value.
      * @param  \Nuwave\Lighthouse\Execution\Arguments\NamedType  $namedType
      * @return \Nuwave\Lighthouse\Execution\Arguments\ArgumentSet|mixed
      */
