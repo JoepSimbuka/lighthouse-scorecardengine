@@ -63,6 +63,7 @@ class ArgumentSetFactory
      * @param  \GraphQL\Language\AST\FieldDefinitionNode|\GraphQL\Language\AST\InputObjectTypeDefinitionNode  $definition
      * @param  mixed[]  $args
      * @return \Nuwave\Lighthouse\Execution\Arguments\ArgumentSet
+     *
      */
     public function wrapArgs(Node $definition, array $args): ArgumentSet
     {
