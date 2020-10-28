@@ -78,7 +78,7 @@ abstract class MutationExecutorDirective extends BaseDirective implements FieldR
 							$argumentSet
 						)
 						->refresh();
-					$this->checkForOverlappingRangeBuckets($created_model);
+					$this->preCommitDatabaseTransactionChecks($created_model);
 					return $created_model;
 				};
 
@@ -264,9 +264,9 @@ abstract class MutationExecutorDirective extends BaseDirective implements FieldR
 	/**
 	 * @param \Illuminate\Database\Eloquent\Model $model
 	 */
-	private function checkForOverlappingRangeBuckets($model): void {
-		if (method_exists($model, 'checkForOverlappingRangeBuckets')) {
-			$model->checkForOverlappingRangeBuckets();
+	private function preCommitDatabaseTransactionChecks($model): void {
+		if (method_exists($model, 'preCommitDatabaseTransactionChecks')) {
+			$model->preCommitDatabaseTransactionChecks();
 		}
 	}
 }
