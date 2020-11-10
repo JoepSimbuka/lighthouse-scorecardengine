@@ -36,15 +36,15 @@ class NestedOneToOne implements ArgResolver
 			$data = $args->toArray();
 			if ($data['id'] !== $current_related->id) {
 				// If allowed delete current association
-				if (is_array($availability) && $availability['delete'] === true) {
+				if (is_array($availability) && $availability['delete'] !== false) {
 					$current_related->cascadeDelete();
 				}
 			}
-			if (is_array($availability) && $availability['update'] === true) {
+			if (is_array($availability) && $availability['update'] !== false) {
 				$updateModel = new ResolveNested(new UpdateModel(new SaveModel($relation)));
 				$updateModel($relation->make(), $args);
 			}
-		} elseif (is_array($availability) && $availability['create'] === true) {
+		} elseif (is_array($availability) && $availability['create'] !== false) {
 			$saveModel = new ResolveNested(new SaveModel($relation));
 			$saveModel($relation->make(), $args);
 		}

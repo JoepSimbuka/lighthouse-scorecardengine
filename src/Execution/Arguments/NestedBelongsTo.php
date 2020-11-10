@@ -27,7 +27,7 @@ class NestedBelongsTo implements ArgResolver
 		$availability = $reflection->getStaticPropertyValue('AVAILABILITY_IN_GRAPHQL');
 
 		if ($args->has('id')) {
-			if (is_array($availability) && $availability['update'] === true) {
+			if (is_array($availability) && $availability['update'] !== false) {
 				$updateModel = new ResolveNested(new UpdateModel(new SaveModel($this->relation)));
 
 				$related = $updateModel(
@@ -40,12 +40,12 @@ class NestedBelongsTo implements ArgResolver
 			}
 		} else {
 			// If allowed delete current association
-			if (is_array($availability) && $availability['delete'] === true) {
+			if (is_array($availability) && $availability['delete'] !== false) {
 				$this->relation->getRelated()->cascadeDelete();
 			}
 			$this->relation->dissociate();
 
-			if (!empty($args->arguments) && is_array($availability) && $availability['create'] === true) {
+			if (!empty($args->arguments) && is_array($availability) && $availability['create'] !== false) {
 				$saveModel = new ResolveNested(new SaveModel($this->relation));
 
 				$related = $saveModel(

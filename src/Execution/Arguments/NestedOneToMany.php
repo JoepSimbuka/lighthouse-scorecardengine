@@ -37,11 +37,11 @@ class NestedOneToMany implements ArgResolver
 
 		foreach ($args->arguments as $nested_operation) {
 			$array = $nested_operation->toPlain();
-			if (is_array($availability) && isset($array['id']) && $availability['update'] === true) {
+			if (is_array($availability) && isset($array['id']) && $availability['update'] !== false) {
 				$related_to_keep[] = $array['id'];
 				$updateModel = new ResolveNested(new UpdateModel(new SaveModel($relation)));
 				$updateModel($relation->make(), $nested_operation->value);
-			} elseif (is_array($availability) && $availability['create'] === true) {
+			} elseif (is_array($availability) && $availability['create'] !== false) {
 				$saveModel = new ResolveNested(new SaveModel($relation));
 				$saveModel($relation->make(), $nested_operation->value);
 			} else {
@@ -51,7 +51,7 @@ class NestedOneToMany implements ArgResolver
 
 		foreach ($current_related as $related) {
 			if (!in_array($related->id, $related_to_keep, false)) {
-				if (is_array($availability) && $availability['delete'] === true) {
+				if (is_array($availability) && $availability['delete'] !== false) {
 					$related->cascadeDelete();
 				}
 			}

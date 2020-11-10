@@ -44,7 +44,7 @@ class NestedManyToMany implements ArgResolver
 					$saveModel($relation->make(), $nested_operation->value);
 				} else {
 					$related_to_keep[] = $array['id'];
-					if (is_array($availability) && $availability['update'] === true) {
+					if (is_array($availability) && $availability['update'] !== false) {
 						$updateModel = new ResolveNested(new UpdateModel(new SaveModel($relation)));
 						$updateModel($relation->make(), $nested_operation->value);
 					} else {
@@ -56,7 +56,7 @@ class NestedManyToMany implements ArgResolver
 			foreach ($current_related as $related) {
 				if (!in_array($related->id, $related_to_keep, false)) {
 					$relation->detach($related->id);
-					if (is_array($availability) && $availability['delete'] === true) {
+					if (is_array($availability) && $availability['delete'] !== false) {
 						$related->cascadeDelete();
 					}
 				}
