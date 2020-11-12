@@ -48,6 +48,17 @@ class SaveModel implements ArgResolver
             /** @var \Illuminate\Database\Eloquent\Relations\BelongsTo $belongsTo */
             $belongsTo = $model->{$relationName}();
             $belongsToResolver = new ResolveNested(new NestedBelongsTo($belongsTo));
+
+	        if (is_numeric($nestedOperations->value)) {
+		        $argument = new Argument();
+		        $argument->value = $nestedOperations->value;
+
+		        $argumentSet = new ArgumentSet();
+		        $argumentSet->arguments['id'] = $argument;
+
+		        $nestedOperations->value = $argumentSet;
+	        }
+
             $belongsToResolver($model, $nestedOperations->value);
         }
 
@@ -55,6 +66,17 @@ class SaveModel implements ArgResolver
             /** @var \Illuminate\Database\Eloquent\Relations\MorphTo $morphTo */
             $morphTo = $model->{$relationName}();
             $morphToResolver = new ResolveNested(new NestedMorphTo($morphTo));
+
+	        if (is_numeric($nestedOperations->value)) {
+		        $argument = new Argument();
+		        $argument->value = $nestedOperations->value;
+
+		        $argumentSet = new ArgumentSet();
+		        $argumentSet->arguments['id'] = $argument;
+
+		        $nestedOperations->value = $argumentSet;
+	        }
+
             $morphToResolver($model, $nestedOperations->value);
         }
 
