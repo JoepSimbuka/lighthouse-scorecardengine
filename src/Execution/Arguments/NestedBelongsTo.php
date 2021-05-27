@@ -41,7 +41,9 @@ class NestedBelongsTo implements ArgResolver
 		} else {
 			// If allowed delete current association
 			if (is_array($availability) && $availability['delete'] !== false) {
-				$this->relation->getRelated()->cascadeDelete();
+				if($model = @$parent->{$this->relation->getRelationName()}){
+					$model->cascadeDelete();
+				}
 			}
 			$this->relation->dissociate();
 
